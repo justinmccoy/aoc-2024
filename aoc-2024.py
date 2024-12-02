@@ -36,13 +36,27 @@ def read_file_into_lists(file_path):
         print(f"An error occurred: {e}")
     return list1, list2
   
+def calculate_similarity_score(list1, list2):
+		list2_map = {}
+		list1_map = {}
+		score = 0
 
+		for num in list2:
+			list2_map[num] = list2_map.get(num, 0) + 1 
+		
+		for num in list1:
+			occurances = list2_map.get(num, 0)
+			#print(f"{num} * {occurances}")
+			score += num * occurances
+
+		return score
 
 def combine_sorted_lists(list1, list2):
     # Sort both lists
     sorted_list1 = sorted(list1)
     sorted_list2 = sorted(list2)
-    # Combine the lists into tuples
+    
+		# Combine the lists into tuples
     paired_list = list(zip(sorted_list1, sorted_list2))
     return paired_list
 
@@ -65,3 +79,7 @@ deltas = calculate_deltas(paired_list)
 
 # Print the result
 print("Total distance between lists: ", deltas)
+
+similarity_score = calculate_similarity_score(list1, list2)
+# Calculate Similarity Score
+print("Similarity Score:", similarity_score)
