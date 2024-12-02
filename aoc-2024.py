@@ -64,4 +64,4 @@ paired_list = combine_sorted_lists(list1, list2)
 deltas = calculate_deltas(paired_list)
 
 # Print the result
-print("Delta Sum between lists: ", deltas)
+print("Total distance between lists: ", deltas)
