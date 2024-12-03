@@ -21,30 +21,30 @@ def read_file_as_lists(file_path):
 
 
 
-def get_reports(reports, saftey_threashold=3, window_size=2):
-		safe = []
-		unsafe = []
+def get_reports(reports, saftey_threashold=3, window_size=2, problem_dampener=True):
 		
 		if window_size < 2:
-				print("Window size must be at least 2 to detect changes.")
-				return safe, unsafe
+				raise ValueError("Window size must be at least 2 to detect changes.")
+
+		safe = []
+		unsafe = []
 
 		for report in reports:
-				diffs = []	
-				for i in range(len(report) - window_size + 1):
-						window = report[i:i + window_size]
-						for j in range(len(window) - 1):
-								diffs.append(window[j + 1] - window[j])
-								#print("Report {}, window[{},{}], diff {}".format(report, window[j+1], window[j], window[j+1] - window[j]))	
+				if len(report) < window_size:
+						unsafe.append(report)  # Treat too-short reports as unsafe
+						continue
+
+				diffs = [b - a for a, b in zip(report,report[1:])]
+				
 				if any(abs(diff) > saftey_threashold for diff in diffs):
-						unsafe.append(report)
+					unsafe.append(report)
 				elif all(diff > 0 for diff in diffs):
-						safe.append(report)
+					safe.append({"report": report, "status": "increasing"} if problem_dampener else report)
 				elif all(diff < 0 for diff in diffs):
-						safe.append(report)
+					safe.append({"report": report, "status": "decreasing"} if problem_dampener else report)
 				else:
-						unsafe.append(report)	
-			
+					unsafe.append(report)
+		
 		return safe, unsafe					
 
 
@@ -55,4 +55,5 @@ file_path = input("Enter the path to the file: ")
 lists = read_file_as_lists(file_path)
 
 safe, unsafe = get_reports(lists)
-print(len(safe))
+print(safe)
+print(unsafe)
