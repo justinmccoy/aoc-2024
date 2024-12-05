@@ -63,6 +63,7 @@ def combine_sorted_lists(list1, list2):
 
 def calculate_deltas(paired_list):
 	deltas = [abs(a-b) for a, b in paired_list]
+	print(deltas)
 	return sum(deltas)
 	
 
