@@ -58,7 +58,7 @@ def find_midpoint(lst):
     """
     n = len(lst)
     if n == 0:
-        raise ValueError("List is empty")
+        return 0
     
     mid_index = n // 2
     
@@ -97,8 +97,51 @@ def validate(edits, rules):
 	return True
 			
 	
+# Given a set of data and two list of rules, validate returning true/false 
+#return list of fixed edits
+def fix_and_validate(edits, rules):
+	
+	fixed = False
+	for index, page in enumerate(edits):		
+		try:
+			#find rules that match currnet edit
+			matching_rules = []
+			for tup in rules:
+				if tup[0] == page:
+					matching_rules.append(tup)
 
+			# In the matching rules check to see if any of the pages are at a later postion 
+			# in the edits.  This would break the rule
+			for _, second_value in matching_rules:
+				try: 
 
+					if edits.index(second_value) < index:
+						# raise PageBreaksPrintingRule(int(page))
+						#SWAP
+						second_value_index = edits.index(second_value)
+						edits[index] = second_value
+						edits[second_value_index] = page
+						fixed = True
+	
+				except ValueError as ve:
+					# It's ok if value isn't found, continue to read through rules
+					continue
+				
+		# except PageBreaksPrintingRule as pbpr:
+		# 		#print(f"page {page} breaks printing rule")
+		# 		return False
+
+		except ValueError as ve:
+				#print(f"Page not found in printing rules, add to new rules and continue {ve}")
+				#fixed_edits.append(page)
+				continue
+		
+	if fixed:	
+		return edits
+	else:
+		return []
+			
+	
 
 
 
@@ -116,13 +159,19 @@ def main():
 		rules = extract_page_ordering_rules(format1)
 
 		midpoints = []
+		fixed_midpoints = []
 
 		for edits in page_edits:
 			if validate(edits, rules):
 				midpoints.append(find_midpoint(edits))
 		
 
-		print(sum(midpoints))
+		for edits in page_edits:
+			fixed_rules = fix_and_validate(edits, rules)
+			fixed_midpoints.append(find_midpoint(fixed_rules))
+
+		print(f"Sum of Midpoints unfixed: {sum(midpoints)}")
+		print(f"Sum of fixed midpoints: {sum(fixed_midpoints)}")
 
 if __name__ == '__main__':
 		main()
